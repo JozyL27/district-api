@@ -1,0 +1,1 @@
+const { JsonWebTokenError } = require('jsonwebtoken')
