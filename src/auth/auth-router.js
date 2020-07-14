@@ -8,7 +8,7 @@ AuthRouter
 .route('/token')
 .post(jsonBodyParser, async (req, res, next) => {
     const { username, password } = req.body
-    const loginUser = {username, password }
+    const loginUser = { username, password }
 
     for (const [key, value] of Object.entries(loginUser))
         if (value == null)
