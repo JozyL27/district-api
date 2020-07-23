@@ -11,7 +11,7 @@ ArticlesRouter
             const categories = await ArticlesService.getCategories(
                 req.app.get('db')
             )
-            res.status(200).json(categories)
+            res.status(200).json(categories.rows)
         } catch(error) {
             next(error)
         }
