@@ -3,6 +3,7 @@ const ArticlesService = require('./articles-service')
 
 const jsonBodyParser = express.json()
 const ArticlesRouter = express.Router()
+// post an article, get all articles from people you follow
 
 ArticlesRouter
     .route('/categories')
@@ -11,6 +12,12 @@ ArticlesRouter
             const categories = await ArticlesService.getCategories(
                 req.app.get('db')
             )
+            if(categories.length == 0) {
+                res.status(400).json({ error: 'uh oh! There are no categories left.' })
+            }
+            if(!categories) {
+                res.status(400).json({ error: 'No categories were found.'})
+            }
             res.status(200).json(categories.rows)
         } catch(error) {
             next(error)
@@ -26,6 +33,12 @@ ArticlesRouter
                 req.app.get('db'),
                 page
             )
+            if(articles.length == 0) {
+                res.status(400).json({ error: 'uh oh! There are no articles left.' })
+            }
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
             res.status(200).json(articles)
         } catch(error) {
             next(error)
@@ -41,6 +54,12 @@ ArticlesRouter
                 req.app.get('db'),
                 page
             )
+            if(articles.length == 0) {
+                res.status(400).json({ error: 'uh oh! There are no articles left.' })
+            }
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
             res.status(200).json(articles)
         } catch(error) {
             next(error)
@@ -58,6 +77,12 @@ ArticlesRouter
                 articleId,
                 page
             )
+            if(comments.length == 0) {
+                res.status(400).json({ error: 'No comments available.' })
+            }
+            if(!comments) {
+                res.status(400).json({ error: 'No comments were found.'})
+            }
             res.status(200).json(comments)
         } catch(error) {
             next(error)
@@ -80,6 +105,12 @@ ArticlesRouter
                 categoryId,
                 page
             )
+            if(articles.length == 0) {
+                res.status(400).json({ error: 'There are no articles under this category.' })
+            }
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
             res.status(200).json(articles)
         } catch(error) {
             next(error)
@@ -93,6 +124,54 @@ ArticlesRouter
         try {
             const articles = await ArticlesService.getPopularArticles(
                 req.app.get('db'),
+                page
+            )
+            if(articles.length == 0) {
+                res.status(400).json({ error: 'uh oh! There are no articles left.' })
+            }
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
+            res.status(200).json(articles)
+        } catch(error) {
+            next(error)
+        }
+    })
+
+ArticlesRouter
+    .route('/:userId')
+    .get(jsonBodyParser, async (req, res, next) => {
+        const { page } = req.body
+        const { userId } = req.params
+
+        try {
+            const articles = await ArticlesService.getAllUserArticles(
+                req.app.get('db'),
+                userId,
+                page
+            )
+            if(articles.length == 0) {
+                res.status(400).json({ error: 'You have no articles.' })
+            }
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
+            res.status(200).json(articles)
+        } catch(error) {
+            next(error)
+        }
+    })
+
+ArticlesRouter
+    .route('/feed/:userId')
+    .get(jsonBodyParser, async (req, res, next) => {
+        const { page } = req.body
+        const { userId } = req.params
+
+        try {
+            const articles = await ArticlesService.getAllFollowerArticles(
+                req.app.get('db'),
+                userId,
                 page
             )
             res.status(200).json(articles)

@@ -2,7 +2,8 @@ BEGIN;
 
 TRUNCATE
     district_comments,
-    district_articles
+    district_articles,
+    user_followers
 RESTART IDENTITY CASCADE;
 
 
@@ -27,12 +28,17 @@ VALUES
   ('Ninth post', 'FOTD (Fit of The Day)',
     'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dignissimos architecto repellat, in amet soluta exercitationem perferendis eius perspiciatis praesentium voluptate nisi deleniti eaque? Rerum ea quisquam dolore, non error earum?', 2, 1),
   ( 'Tenth post', 'Grail',
-    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum molestiae accusamus veniam consectetur tempora, corporis obcaecati ad nisi asperiores tenetur, autem magnam. Iste, architecto obcaecati tenetur quidem voluptatum ipsa quam?', 1, 1);
+    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum molestiae accusamus veniam consectetur tempora, corporis obcaecati ad nisi asperiores tenetur, autem magnam. Iste, architecto obcaecati tenetur quidem voluptatum ipsa quam?', 3, 1);
 
 INSERT INTO district_comments (text, article_id, user_id)
 VALUES
     ('very cool', 1, 1),
     ('lame asf', 2, 1),
     ('this decent ig', 1, 2);
+
+INSERT INTO user_followers(user_id, follower_id)
+VALUES
+  (1, 2),
+  (1,3);
 
 COMMIT;

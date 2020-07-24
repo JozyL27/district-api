@@ -57,6 +57,35 @@ const ArticlesService = {
         .limit(articlesPerPage)
         .offset(offset)
     },
+    getAllUserArticles(db, userId, page = 1) {
+        const articlesPerPage = 10
+        const offset = articlesPerPage * (page -1)
+
+        return db('district_articles')
+        .select('*')
+        .where('district_articles.author', userId)
+        .orderBy('date_published', 'desc')
+        .limit(articlesPerPage)
+        .offset(offset)
+    },
+    getAllFollowerArticles(db, userId, page = 1) {
+        const articlesPerPage = 10
+        const offset = articlesPerPage * (page - 1)
+
+        return db
+        .from('user_followers')
+        .select('follower_id', 'title', 
+        'content', 'date_published', 
+        'district_articles.id as article_id', 
+        'district_articles.author', 
+        'district_users.avatar', 'district_users.username')
+        .innerJoin('district_articles', 'user_followers.follower_id', 'district_articles.author')
+        .innerJoin('district_users', 'user_followers.follower_id', 'district_users.id')
+        .where('user_followers.user_id', userId)
+        .orderBy('date_published', 'desc')
+        .limit(articlesPerPage)
+        .offset(offset)
+    },
 }
 
 module.exports = ArticlesService
