@@ -36,6 +36,27 @@ const ArticlesService = {
         .limit(articlesPerPage)
         .offset(offset)
     },
+    getArticlesByCategory(db, category, page = 1) {
+        const articlesPerPage = 10
+        const offset = articlesPerPage * (page - 1)
+
+        return db('district_articles')
+        .select('*')
+        .where('district_articles.style', category)
+        .orderBy('upvotes', 'desc')
+        .limit(articlesPerPage)
+        .offset(offset)
+    },
+    getPopularArticles(db, page = 1) {
+        const articlesPerPage = 10
+        const offset = articlesPerPage * (page - 1)
+
+        return db('district_articles')
+        .select('*')
+        .orderBy('upvotes', 'desc')
+        .limit(articlesPerPage)
+        .offset(offset)
+    },
 }
 
 module.exports = ArticlesService
