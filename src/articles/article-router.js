@@ -1,5 +1,6 @@
 const express = require('express')
 const ArticlesService = require('./articles-service')
+const path = require('path')
 
 const jsonBodyParser = express.json()
 const ArticlesRouter = express.Router()
@@ -61,6 +62,35 @@ ArticlesRouter
                 res.status(400).json({ error: 'No articles were found.'})
             }
             res.status(200).json(articles)
+        } catch(error) {
+            next(error)
+        }
+    })
+    .post(jsonBodyParser, async (req, res, next) => {
+        const { title, content, 
+            date_published, author, 
+            style, upvotes } = req.body
+
+        const newArticle = { title, content, 
+            date_published, 
+            author, style, upvotes }
+
+        try {
+            for(const [key, value] of Object.entries(newArticle))
+                if(value == null)
+                    return res.status(400).json({
+                        error: `Missing '${key}' in request body.`
+                    })
+
+            const article = await ArticlesService.insertArticle(
+                req.app.get('db'),
+                newArticle
+            )
+
+            res
+                .status(201)
+                .location(path.posix.join(req.originalUrl, `/${article.id}`))
+                .json(ArticlesService.serializeArticle(article))
         } catch(error) {
             next(error)
         }

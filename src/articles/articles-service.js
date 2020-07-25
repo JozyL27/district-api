@@ -1,3 +1,5 @@
+const xss = require('xss')
+
 const ArticlesService = {
     getCategories(db) {
         return db.raw('SELECT unnest(enum_range(NULL::article_category))::text AS category')
@@ -85,6 +87,27 @@ const ArticlesService = {
         .orderBy('date_published', 'desc')
         .limit(articlesPerPage)
         .offset(offset)
+    },
+    deleteArticle() {},
+    updateArticle() {},
+    insertArticle(db, newArticle) {
+        return db('district_articles')
+        .insert(newArticle)
+        .returning('*')
+        .then(rows => {
+            return rows[0]
+        })
+    },
+    serializeArticle(article) {
+        return {
+            id: article.id,
+            title: xss(article.title),
+            content: xss(article.content),
+            date_published: article.date_published,
+            style: article.style,
+            author: article.author,
+            upvotes: article.upvotes
+        }
     },
 }
 
