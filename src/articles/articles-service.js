@@ -109,6 +109,12 @@ const ArticlesService = {
             upvotes: article.upvotes
         }
     },
+    getArticleById(db, id) {
+        return db('district_articles')
+        .select('*')
+        .where('id', id)
+        .first()
+    },
 }
 
 module.exports = ArticlesService

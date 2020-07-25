@@ -4,7 +4,7 @@ const path = require('path')
 
 const jsonBodyParser = express.json()
 const ArticlesRouter = express.Router()
-// post an article, get all articles from people you follow
+// post an article, get all articles from people you follow, article comment button added to frontend
 
 ArticlesRouter
     .route('/categories')
@@ -91,6 +91,28 @@ ArticlesRouter
                 .status(201)
                 .location(path.posix.join(req.originalUrl, `/${article.id}`))
                 .json(ArticlesService.serializeArticle(article))
+        } catch(error) {
+            next(error)
+        }
+    })
+
+ArticlesRouter
+    .route('/:articleId')
+    .get(async (req, res, next) => {
+        const { articleId } = req.params
+        try {
+            const article  = await ArticlesService.getArticleById(
+                req.app.get('db'),
+                articleId
+            )
+
+            if(!article) {
+                return res.status(404).json({
+                    error: 'Article does not exist.'
+                })
+            }
+
+            res.status(200).json(ArticlesService.serializeArticle(article))
         } catch(error) {
             next(error)
         }
