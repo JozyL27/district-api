@@ -72,8 +72,7 @@ ArticlesRouter
             style, upvotes } = req.body
 
         const newArticle = { title, content, 
-            date_published, 
-            author, style, upvotes }
+            author, style }
 
         try {
             for(const [key, value] of Object.entries(newArticle))
@@ -81,6 +80,9 @@ ArticlesRouter
                     return res.status(400).json({
                         error: `Missing '${key}' in request body.`
                     })
+                    
+            newArticle.date_published = date_published
+            newArticle.upvotes = upvotes
 
             const article = await ArticlesService.insertArticle(
                 req.app.get('db'),
