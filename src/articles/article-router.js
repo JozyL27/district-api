@@ -27,8 +27,8 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/latest')
-    .get(jsonBodyParser, async (req, res, next) => {
-        const { page } = req.body
+    .get(async (req, res, next) => {
+        const { page } = req.query
         try {
             const articles = await ArticlesService.getMostRecentArticles(
                 req.app.get('db'),
@@ -48,8 +48,8 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/')
-    .get(jsonBodyParser, async (req, res, next) => {
-        const { page } = req.body
+    .get(async (req, res, next) => {
+        const { page } = req.query
         try {
             const articles = await ArticlesService.getAllArticles(
                 req.app.get('db'),
@@ -157,9 +157,9 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/:articleId/comments')
-    .get(jsonBodyParser, async (req, res, next) => {
+    .get(async (req, res, next) => {
         const { articleId } = req.params
-        const { page } = req.body
+        const { page } = req.query
         try {
             const comments = await ArticlesService.getArticleComments(
                 req.app.get('db'),
@@ -180,13 +180,9 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/category/:categoryId')
-    .get(jsonBodyParser, async (req, res, next) => {
+    .get(async (req, res, next) => {
         let { categoryId } = req.params
-        const { page } = req.body
-        
-        // Lowercase the category id and uppercase the first letter, removes spaces
-        categoryId = categoryId.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
-        encodeURIComponent(categoryId)
+        const { page } = req.query
 
         try {
             const articles = await ArticlesService.getArticlesByCategory(
@@ -195,7 +191,7 @@ ArticlesRouter
                 page
             )
             if(articles.length == 0) {
-                res.status(400).json({ error: 'There are no articles under this category.' })
+                res.status(400).json({ error: 'There are no more articles under this category.' })
             }
             if(!articles) {
                 res.status(400).json({ error: 'No articles were found.'})
@@ -208,8 +204,8 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/popular')
-    .get(jsonBodyParser, async (req, res, next) => {
-        const { page } = req.body
+    .get(async (req, res, next) => {
+        const { page } = req.query
 
         try {
             const articles = await ArticlesService.getPopularArticles(
@@ -230,8 +226,8 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/:userId')
-    .get(jsonBodyParser, async (req, res, next) => {
-        const { page } = req.body
+    .get(async (req, res, next) => {
+        const { page } = req.query
         const { userId } = req.params
 
         try {
@@ -254,8 +250,8 @@ ArticlesRouter
 
 ArticlesRouter
     .route('/feed/:userId')
-    .get(jsonBodyParser, async (req, res, next) => {
-        const { page } = req.body
+    .get(async (req, res, next) => {
+        const { page } = req.query
         const { userId } = req.params
 
         try {

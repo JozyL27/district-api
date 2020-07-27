@@ -5,7 +5,7 @@ const ArticlesService = {
         return db.raw('SELECT unnest(enum_range(NULL::article_category))::text AS category')
     },
     getMostRecentArticles(db, page = 1) {
-        const articlesPerPage = 10
+        const articlesPerPage = 9
         const offset = articlesPerPage * (page - 1)
 
         return db('district_articles')
