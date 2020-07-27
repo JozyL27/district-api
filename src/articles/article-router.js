@@ -80,7 +80,7 @@ ArticlesRouter
                     return res.status(400).json({
                         error: `Missing '${key}' in request body.`
                     })
-                    
+
             newArticle.date_published = date_published
             newArticle.upvotes = upvotes
 
@@ -115,6 +115,41 @@ ArticlesRouter
             }
 
             res.status(200).json(ArticlesService.serializeArticle(article))
+        } catch(error) {
+            next(error)
+        }
+    })
+    .delete(async (req, res, next) => {
+        const { articleId } = req.params
+
+        try {
+            await ArticlesService.deleteArticle(
+                req.app.get('db'),
+                articleId
+            )
+
+            res.status(204).end()
+        } catch(error) {
+            next(error)
+        }
+    })
+    .patch(jsonBodyParser, async (req, res, next) => {
+        const { articleId } = req.params
+        const { title, content } = req.body
+        const articleToUpdate = { title, content }
+
+        const numberOfValues = Object.values(articleToUpdate).filter(Boolean).length
+        if (numberOfValues === 0)
+            return res.status(400).json({ error: `Request body must contain either 'title' or 'content'` })
+
+        try {
+             await ArticlesService.updateArticle(
+                req.app.get('db'),
+                articleId,
+                articleToUpdate
+            )
+
+            res.status(204).end()
         } catch(error) {
             next(error)
         }
@@ -170,6 +205,7 @@ ArticlesRouter
             next(error)
         }
     })
+
 ArticlesRouter
     .route('/popular')
     .get(jsonBodyParser, async (req, res, next) => {
