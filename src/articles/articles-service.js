@@ -15,7 +15,7 @@ const ArticlesService = {
         .offset(offset)
     },
     getArticleComments(db, articleId, page = 1) {
-        const commentsPerpage = 15
+        const commentsPerpage = 12
         const offset = commentsPerpage * (page - 1)
 
         return db('district_comments')
@@ -30,7 +30,7 @@ const ArticlesService = {
         .offset(offset)
     },
     getAllArticles(db, page = 1) {
-        const articlesPerPage = 10
+        const articlesPerPage = 9
         const offset = articlesPerPage * (page - 1)
 
         return db('district_articles')
@@ -39,7 +39,7 @@ const ArticlesService = {
         .offset(offset)
     },
     getArticlesByCategory(db, category, page = 1) {
-        const articlesPerPage = 10
+        const articlesPerPage = 9
         const offset = articlesPerPage * (page - 1)
 
         return db('district_articles')
@@ -50,7 +50,7 @@ const ArticlesService = {
         .offset(offset)
     },
     getPopularArticles(db, page = 1) {
-        const articlesPerPage = 10
+        const articlesPerPage = 9
         const offset = articlesPerPage * (page - 1)
 
         return db('district_articles')
@@ -60,7 +60,7 @@ const ArticlesService = {
         .offset(offset)
     },
     getAllUserArticles(db, userId, page = 1) {
-        const articlesPerPage = 10
+        const articlesPerPage = 9
         const offset = articlesPerPage * (page -1)
 
         return db('district_articles')
@@ -71,7 +71,7 @@ const ArticlesService = {
         .offset(offset)
     },
     getAllFollowerArticles(db, userId, page = 1) {
-        const articlesPerPage = 10
+        const articlesPerPage = 9
         const offset = articlesPerPage * (page - 1)
 
         return db

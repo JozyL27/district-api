@@ -26,6 +26,27 @@ ArticlesRouter
     })
 
 ArticlesRouter
+    .route('/popular')
+    .get(async (req, res, next) => {
+        const { page } = req.query
+        try {
+            const articles = await ArticlesService.getPopularArticles(
+                req.app.get('db'),
+                page
+            )
+            if(articles.length == 0) {
+                res.status(400).json({ error: 'uh oh! There are no articles left.' })
+            }
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
+            res.status(200).json(articles)
+        } catch(error) {
+            next(error)
+        }
+    })
+
+ArticlesRouter
     .route('/latest')
     .get(async (req, res, next) => {
         const { page } = req.query
@@ -203,29 +224,7 @@ ArticlesRouter
     })
 
 ArticlesRouter
-    .route('/popular')
-    .get(async (req, res, next) => {
-        const { page } = req.query
-
-        try {
-            const articles = await ArticlesService.getPopularArticles(
-                req.app.get('db'),
-                page
-            )
-            if(articles.length == 0) {
-                res.status(400).json({ error: 'uh oh! There are no articles left.' })
-            }
-            if(!articles) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
-
-ArticlesRouter
-    .route('/:userId')
+    .route('/userarticles/:userId')
     .get(async (req, res, next) => {
         const { page } = req.query
         const { userId } = req.params
