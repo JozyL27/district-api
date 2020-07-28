@@ -43,7 +43,13 @@ const ArticlesService = {
         const offset = articlesPerPage * (page - 1)
 
         return db('district_articles')
-        .select('*')
+        .select('title', 
+        'content', 'date_published', 
+        'district_articles.id', 
+        'district_articles.author', 
+        'district_users.avatar', 'district_users.username',
+        'upvotes', 'style')
+        .innerJoin('district_users', 'district_articles.author', 'district_users.id')
         .where('district_articles.style', category)
         .orderBy('upvotes', 'desc')
         .limit(articlesPerPage)
@@ -54,7 +60,13 @@ const ArticlesService = {
         const offset = articlesPerPage * (page - 1)
 
         return db('district_articles')
-        .select('*')
+        .select('title', 
+        'content', 'date_published', 
+        'district_articles.id', 
+        'district_articles.author', 
+        'district_users.avatar', 'district_users.username',
+        'upvotes', 'style')
+        .innerJoin('district_users', 'district_articles.author', 'district_users.id')
         .orderBy('upvotes', 'desc')
         .limit(articlesPerPage)
         .offset(offset)
@@ -120,7 +132,14 @@ const ArticlesService = {
     getArticleById(db, id) {
         return db('district_articles')
         .select('*')
-        .where('id', id)
+        .where('district_articles.id', id)
+        .first()
+    },
+    getAuthorInfo(db, authorId) {
+        return db('district_users')
+        .select('district_users.avatar', 
+        'district_users.username')
+        .where('district_users.id', authorId)
         .first()
     },
 }

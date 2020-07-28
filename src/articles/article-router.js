@@ -128,14 +128,17 @@ ArticlesRouter
                 req.app.get('db'),
                 articleId
             )
-
             if(!article) {
                 return res.status(404).json({
                     error: 'Article does not exist.'
                 })
             }
+            const userInfo = await ArticlesService.getAuthorInfo(
+                req.app.get('db'),
+                article.author
+            )
 
-            res.status(200).json(ArticlesService.serializeArticle(article))
+            res.status(200).json({ ...ArticlesService.serializeArticle(article), ...userInfo })
         } catch(error) {
             next(error)
         }
