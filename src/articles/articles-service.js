@@ -138,7 +138,7 @@ const ArticlesService = {
     getAuthorInfo(db, authorId) {
         return db('district_users')
         .select('district_users.avatar', 
-        'district_users.username')
+        'district_users.username', 'district_users.bio')
         .where('district_users.id', authorId)
         .first()
     },
