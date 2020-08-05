@@ -24,10 +24,14 @@ const CommentService = {
             return rows[0]
         })
     },
-    updateComment() {},
-    deleteComment(db, commentId) {
+    updateComment(db, id, newCommentFields) {
         return db('district_comments')
-        .where({ commentId })
+        .where({ id })
+        .update(newCommentFields)
+    },
+    deleteComment(db, id) {
+        return db('district_comments')
+        .where({ id })
         .delete()
     },
     serializeComment(comment) {

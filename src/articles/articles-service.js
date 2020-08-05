@@ -85,14 +85,14 @@ const ArticlesService = {
         .limit(articlesPerPage)
         .offset(offset)
     },
-    deleteArticle(db, articleId) {
+    deleteArticle(db, id) {
         return db('district_articles')
-        .where({ articleId })
+        .where({ id })
         .delete()
     },
-    updateArticle(db, articleId, newArticleFields) {
+    updateArticle(db, id, newArticleFields) {
         return db('district_articles')
-        .where({ articleId })
+        .where({ id })
         .update(newArticleFields)
     },
     insertArticle(db, newArticle) {

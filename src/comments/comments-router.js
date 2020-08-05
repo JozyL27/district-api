@@ -52,7 +52,27 @@ CommentsRouter
             next(error)
         }
     })
-    .patch()
+    .patch(JsonBodyParser, async (req, res, next) => {
+        const { commentId } = req.params
+        const { text } = req.body
+        const commentToUpdate = { text }
+
+        const numberOfValues = Object.values(commentToUpdate).filter(Boolean).length
+        if (numberOfValues === 0)
+            return res.status(400).json({ error: `Request body must contain 'text'` })
+
+        try {
+            await CommentService.updateComment(
+                req.app.get('db'),
+                commentId,
+                commentToUpdate
+            )
+
+            res.status(204).end()
+        } catch(error) {
+            next(error)
+        }
+    })
 
 
 CommentsRouter
