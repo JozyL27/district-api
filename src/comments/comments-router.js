@@ -1,12 +1,62 @@
 const express = require('express')
 const CommentService = require('./comments-service')
+const path = require('path')
 
 const JsonBodyParser = express.json()
 const CommentsRouter = express.Router()
 
 
 CommentsRouter
-    .route('/:articleId')
+    .route('/')
+    .post(JsonBodyParser, async (req, res, next) => {
+        const { text, date_commented, user_id, article_id } = req.body
+        const newComment = { text, article_id, user_id }
+
+        try {
+            for(const [key, value] of Object.entries(newComment))
+                if(value == null)
+                    return res.status(400).json({
+                        error: `Missing '${key}' in request body.`
+                    })
+
+            newComment.date_commented = date_commented
+
+            const comment = await CommentService.insertComment(
+                req.app.get('db'),
+                newComment
+            )
+
+            res
+                .status(201)
+                .location(path.posix.join(req.originalUrl, `/${comment.id}`))
+                .json(CommentService.serializeComment(comment))
+        } catch(error) {
+            next(error)
+        }
+    })
+
+
+CommentsRouter
+    .route('/:commentId')
+    .delete(async (req, res, next) => {
+        const { commentId } = req.params
+
+        try {
+            await CommentService.deleteComment(
+                req.app.get('db'),
+                commentId
+            )
+
+            res.status(204).end()
+        } catch(error) {
+            next(error)
+        }
+    })
+    .patch()
+
+
+CommentsRouter
+    .route('/article/:articleId')
     .get(async (req, res, next) => {
         const { articleId } = req.params
         const { page } = req.query

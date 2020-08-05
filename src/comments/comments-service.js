@@ -1,3 +1,5 @@
+const xss = require('xss')
+
 const CommentService = {
     getArticleComments(db, articleId, page = 1) {
         const commentsPerpage = 12
@@ -13,6 +15,29 @@ const CommentService = {
         .where('district_comments.article_id', articleId)
         .limit(commentsPerpage)
         .offset(offset)
+    },
+    insertComment(db, newComment) {
+        return db('district_comments')
+        .insert(newComment)
+        .returning('*')
+        .then(rows => {
+            return rows[0]
+        })
+    },
+    updateComment() {},
+    deleteComment(db, commentId) {
+        return db('district_comments')
+        .where({ commentId })
+        .delete()
+    },
+    serializeComment(comment) {
+        return {
+            id: comment.id,
+            text: xss(comment.text),
+            date_commented: comment.date_commented,
+            article_id: comment.article_id,
+            user_id: comment.user_id
+        }
     },
 }
 
