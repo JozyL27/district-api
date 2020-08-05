@@ -180,29 +180,6 @@ ArticlesRouter
     })
 
 ArticlesRouter
-    .route('/:articleId/comments')
-    .get(async (req, res, next) => {
-        const { articleId } = req.params
-        const { page } = req.query
-        try {
-            const comments = await ArticlesService.getArticleComments(
-                req.app.get('db'),
-                articleId,
-                page
-            )
-            if(comments.length == 0) {
-                res.status(400).json({ error: 'No comments available.' })
-            }
-            if(!comments) {
-                res.status(400).json({ error: 'No comments were found.'})
-            }
-            res.status(200).json(comments)
-        } catch(error) {
-            next(error)
-        }
-    })
-
-ArticlesRouter
     .route('/category/:categoryId')
     .get(async (req, res, next) => {
         let { categoryId } = req.params

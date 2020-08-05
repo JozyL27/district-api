@@ -62,7 +62,7 @@ UpvoteRouter
                 newUpvoteValue
             )
             
-            res.status(201).end()
+            res.status(201).json({ message: `Upvoted!` })
         } catch(error) {
             next(error)
         }

@@ -9,6 +9,7 @@ const UserRouter = require('./user/user-router')
 const AuthRouter = require('./auth/auth-router')
 const ArticlesRouter = require('./articles/article-router')
 const UpvoteRouter = require('./Upvotes/upvote-router')
+const CommentsRouter = require('./comments/comments-router')
 
 const app = express()
 
@@ -25,6 +26,7 @@ app.use('/api/user', UserRouter)
 app.use('/api/auth', AuthRouter)
 app.use('/api/articles', ArticlesRouter)
 app.use('/api/upvotes', UpvoteRouter)
+app.use('/api/comments', CommentsRouter)
 app.get('/', (req, res) => {
     res.send('Hello, World!')
 })
