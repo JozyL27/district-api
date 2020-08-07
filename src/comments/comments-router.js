@@ -86,7 +86,10 @@ CommentsRouter
                 articleId,
                 page
             )
-            if(comments.length == 0) {
+            if(comments.length == 0 && page > 1) {
+                res.status(400).json({ error: 'No more comments are available.' })
+            }
+            if(comments.length === 0) {
                 res.status(400).json({ error: 'No comments available.' })
             }
             if(!comments) {
