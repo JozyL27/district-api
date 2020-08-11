@@ -43,6 +43,12 @@ const CommentService = {
             user_id: comment.user_id
         }
     },
+    getCommentById(db, id) {
+        return db('district_comments')
+        .select('*')
+        .where('district_comments.id', id)
+        .first()
+    },
 }
 
 module.exports = CommentService

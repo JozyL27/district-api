@@ -38,6 +38,23 @@ CommentsRouter
 
 CommentsRouter
     .route('/:commentId')
+    .get(async (req, res, next) => {
+        const { commentId } = req.params
+
+        try {
+            const comment = await CommentService.getCommentById(
+                req.app.get('db'),
+                commentId
+            )
+            if(!comment.id) {
+                return res.status(400).json({ error: 'No comment found. '})
+            }
+
+            res.status(200).json(comment)
+        } catch(error) {
+            next(error)
+        }
+    })
     .delete(async (req, res, next) => {
         const { commentId } = req.params
 
