@@ -18,6 +18,11 @@ CommentsRouter
                     return res.status(400).json({
                         error: `Missing '${key}' in request body.`
                     })
+            
+            if(text.length < 1) {
+                return res.status(400)
+                .json({ error: `Comment body cannot be empty.` })
+            }
 
             newComment.date_commented = date_commented
 
