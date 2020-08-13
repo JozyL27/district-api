@@ -23,6 +23,10 @@ CommentsRouter
                 return res.status(400)
                 .json({ error: `Comment body cannot be empty.` })
             }
+            if(text.length > 250) {
+                return res.status(400)
+                .json({ error: 'Comments cannot exceed 250 characters.' })
+            }
 
             newComment.date_commented = date_commented
 
@@ -83,6 +87,14 @@ CommentsRouter
         if (numberOfValues === 0)
             return res.status(400).json({ error: `Request body must contain 'text'` })
 
+        if(text.length > 250) {
+            return res.status(400)
+            .json({ error: 'Comments cannot exceed 250 characters.' })
+        }
+        if(text.length < 1) {
+            return res.status(400)
+            .json({ error: `Comment body cannot be empty.` })
+        }
         try {
             await CommentService.updateComment(
                 req.app.get('db'),

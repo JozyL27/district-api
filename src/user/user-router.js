@@ -52,4 +52,26 @@ UserRouter
         }
     })
 
+UserRouter
+    .route('/:userId')
+    .get(async (req, res, next) => {
+        const { userId } = req.params
+
+        try {
+            const userInfo = await UserService.getUserInfo(
+                req.app.get('db'),
+                userId
+            )
+            if(!userInfo) {
+                return res.status(400).json({
+                    error: 'No user info was found.'
+                })
+            }
+
+            res.status(200).json(userInfo)
+        } catch(error) {
+            next(error)
+        }
+    })
+
     module.exports = UserRouter

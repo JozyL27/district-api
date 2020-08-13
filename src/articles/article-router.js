@@ -191,11 +191,11 @@ ArticlesRouter
                 categoryId,
                 page
             )
-            if(articles.length == 0) {
-                res.status(400).json({ error: 'There are no more articles under this category.' })
-            }
             if(!articles) {
                 res.status(400).json({ error: 'No articles were found.'})
+            }
+            if(articles.length == 0) {
+                res.status(400).json({ error: `There are no ${categoryId} articles.` })
             }
             res.status(200).json(articles)
         } catch(error) {

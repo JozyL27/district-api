@@ -48,6 +48,12 @@ const UserService = {
             password: user.password,
         }
     },
+    getUserInfo(db, id) {
+        return db('district_users')
+        .select('district_users.avatar', 'district_users.bio')
+        .where('district_users.id', id)
+        .first()
+    },
 }
 
 module.exports = UserService
