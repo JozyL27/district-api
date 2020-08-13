@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 const UserService = require('./user-service')
+const ArticlesService = require('../articles/articles-service')
 
 const UserRouter = express.Router()
 const jsonBodyParser = express.json()
@@ -58,7 +59,7 @@ UserRouter
         const { userId } = req.params
 
         try {
-            const userInfo = await UserService.getUserInfo(
+            const userInfo = await ArticlesService.getAuthorInfo(
                 req.app.get('db'),
                 userId
             )
