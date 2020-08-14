@@ -48,6 +48,11 @@ const UserService = {
             password: user.password,
         }
     },
+    updateUserInfo(db, id, updateUserInfo) {
+        return db('district_users')
+        .where('district_users.id', id)
+        .update(updateUserInfo)
+    },
 }
 
 module.exports = UserService

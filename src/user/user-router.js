@@ -74,5 +74,45 @@ UserRouter
             next(error)
         }
     })
+    .patch(jsonBodyParser, async (req, res, next) => {
+        const { userId } = req.params
+        const { bio, avatar, username } = req.body
+
+        if(bio.length > 250) {
+            return res.status(400).json({
+                error: 'Bio cannot exceed 250 characters.'
+            })
+        }
+
+        if(username.length > 24) {
+            return res.status(400).json({
+                error: 'Username cannot exceed 24 characters.'
+            })
+        }
+
+        try {
+            const newUserInfo = { bio, username }
+            const hasUserWithUserName = await UserService.hasUserWithUserName(
+                req.app.get('db'),
+                username
+            )
+
+            if(hasUserWithUserName) {
+                return res.status(400).json({
+                    error: 'Username already taken.'
+                })
+            }
+
+            await UserService.updateUserInfo(
+                req.app.get('db'),
+                userId,
+                newUserInfo
+            )
+
+            res.status(204).end()
+        } catch(error) {
+            next(error)
+        }
+    })
 
     module.exports = UserRouter
