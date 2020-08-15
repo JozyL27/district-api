@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const xss = require('xss')
 
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
+const REGEX_WHITE_SPACES = /(\s)/gi
 
 const UserService = {
     hasUserWithUserName(db, username) {
@@ -32,6 +33,24 @@ const UserService = {
 
         if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
             return 'Password must contain one upper case, lower case, number, and special character'
+        }
+        return null
+    },
+    vaidateUsername(username) {
+        if(username.length > 24) {
+            return res.status(400).json({
+                error: 'Username cannot exceed 24 characters.'
+            })
+        }
+
+        if(username.length < 4) {
+            return res.status(400).json({
+                error: 'Username must be at least 4 characters long.'
+            })
+        }
+
+        if(REGEX_WHITE_SPACES.test(username)) {
+            return 'Username cannot contain spaces.'
         }
         return null
     },

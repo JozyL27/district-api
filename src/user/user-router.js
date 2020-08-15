@@ -84,13 +84,12 @@ UserRouter
             })
         }
 
-        if(username.length > 24) {
-            return res.status(400).json({
-                error: 'Username cannot exceed 24 characters.'
-            })
-        }
-
         try {
+            const usernameError = UserService.vaidateUsername(username)
+
+            if (usernameError)
+                return res.status(400).json({ error: usernameError })
+
             const newUserInfo = { bio, username }
             const hasUserWithUserName = await UserService.hasUserWithUserName(
                 req.app.get('db'),
