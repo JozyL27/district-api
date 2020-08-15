@@ -91,12 +91,18 @@ UserRouter
                 return res.status(400).json({ error: usernameError })
 
             const newUserInfo = { bio, username }
+
             const hasUserWithUserName = await UserService.hasUserWithUserName(
                 req.app.get('db'),
                 username
             )
 
-            if(hasUserWithUserName) {
+            const userInfo = await ArticlesService.getAuthorInfo(
+                req.app.get('db'),
+                userId
+            )
+
+            if(hasUserWithUserName && userInfo.username !== username) {
                 return res.status(400).json({
                     error: 'Username already taken.'
                 })
