@@ -91,7 +91,11 @@ const ArticlesService = {
 
         return db
         .from('user_votes')
-        .select('*')
+        .select('district_articles.id', 'district_articles.title', 
+        'district_articles.content', 'district_articles.date_published', 
+        'district_articles.style', 'district_articles.author', 
+        'district_articles.upvotes', 'district_users.username', 
+        'district_users.avatar')
         .innerJoin('district_articles', 'user_votes.article_id', 'district_articles.id')
         .innerJoin('district_users', 'district_articles.author', 'district_users.id')
         .where('user_votes.user_id', userId)
