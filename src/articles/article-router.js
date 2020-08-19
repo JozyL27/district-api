@@ -101,7 +101,26 @@ ArticlesRouter
                     return res.status(400).json({
                         error: `Missing '${key}' in request body.`
                     })
+            
+            if(title.length < 4) {
+                return res.status(400).json({
+                    error: 'Article title must be at least 4 characters long.'
+                })
+            }
 
+            if(style.length < 1) {
+                return res.status(400).json({
+                    error: 'Article must have a category.'
+                })
+            }
+
+            if(content.length > 500) {
+                return res.status(400).json({
+                    error: 'Content must not exceed 500 characters.'
+                })
+            }
+
+            // content should not exceed a certainnumber of characters.
             newArticle.date_published = date_published
             newArticle.upvotes = upvotes
 

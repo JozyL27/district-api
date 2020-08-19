@@ -38,15 +38,11 @@ const UserService = {
     },
     vaidateUsername(username) {
         if(username.length > 24) {
-            return res.status(400).json({
-                error: 'Username cannot exceed 24 characters.'
-            })
+            return 'Username cannot exceed 24 characters.'
         }
 
         if(username.length < 4) {
-            return res.status(400).json({
-                error: 'Username must be at least 4 characters long.'
-            })
+            return 'Username must be at least 4 characters long.'
         }
 
         if(REGEX_WHITE_SPACES.test(username)) {
