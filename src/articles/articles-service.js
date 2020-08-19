@@ -85,6 +85,20 @@ const ArticlesService = {
         .limit(articlesPerPage)
         .offset(offset)
     },
+    getUpvotedArticles(db, userId, page = 1) {
+        const articlesPerPage = 9
+        const offset = articlesPerPage * (page - 1)
+
+        return db
+        .from('user_votes')
+        .select('*')
+        .innerJoin('district_articles', 'user_votes.article_id', 'district_articles.id')
+        .innerJoin('district_users', 'district_articles.author', 'district_users.id')
+        .where('user_votes.user_id', userId)
+        .orderBy('district_articles.date_published', 'desc')
+        .limit(articlesPerPage)
+        .offset(offset)
+    },
     deleteArticle(db, id) {
         return db('district_articles')
         .where({ id })

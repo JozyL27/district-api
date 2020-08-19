@@ -68,6 +68,28 @@ ArticlesRouter
     })
 
 ArticlesRouter
+    .route('/upvoted/:userId')
+    .get(async (req, res, next) => {
+        const { userId } = req.params
+        const { page } = req.query
+
+        try {
+            const articles = await ArticlesService.getUpvotedArticles(
+                req.app.get('db'),
+                userId,
+                page
+            )
+            if(!articles) {
+                res.status(400).json({ error: 'No articles were found.'})
+            }
+
+            res.status(200).json(articles)
+        } catch(error) {
+            next(error)
+        }
+    })
+
+ArticlesRouter
     .route('/')
     .get(async (req, res, next) => {
         const { page } = req.query
