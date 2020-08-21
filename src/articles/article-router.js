@@ -55,10 +55,7 @@ ArticlesRouter
                 req.app.get('db'),
                 page
             )
-            if(articles.length == 0) {
-                res.status(400).json({ error: 'uh oh! There are no articles left.' })
-            }
-            if(!articles) {
+            if(!articles || articles.length < 1) {
                 res.status(400).json({ error: 'No articles were found.'})
             }
             res.status(200).json(articles)
@@ -79,7 +76,7 @@ ArticlesRouter
                 userId,
                 page
             )
-            if(!articles) {
+            if(!articles || articles.length === 0) {
                 res.status(400).json({ error: 'No articles were found.'})
             }
 
@@ -235,7 +232,7 @@ ArticlesRouter
             if(!articles) {
                 res.status(400).json({ error: 'No articles were found.'})
             }
-            if(articles.length == 0) {
+            if(articles.length === 0) {
                 res.status(400).json({ error: `There are no ${categoryId} articles.` })
             }
             res.status(200).json(articles)
