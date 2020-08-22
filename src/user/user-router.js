@@ -76,7 +76,7 @@ UserRouter.route("/:userId")
   })
   .patch(jsonBodyParser, async (req, res, next) => {
     const { userId } = req.params;
-    const { bio, username } = req.body;
+    const { bio, username, avatar } = req.body;
 
     if (bio.length > 250) {
       return res.status(400).json({
@@ -89,7 +89,7 @@ UserRouter.route("/:userId")
 
       if (usernameError) return res.status(400).json({ error: usernameError });
 
-      const newUserInfo = { bio, username };
+      const newUserInfo = { bio, username, avatar };
 
       const hasUserWithUserName = await UserService.hasUserWithUserName(
         req.app.get("db"),
@@ -115,8 +115,7 @@ UserRouter.route("/:userId")
     }
   });
 
-UserRouter.route("/avatar/:userId").post(async (req, res, next) => {
-  const { userId } = req.params;
+UserRouter.route("/avatar").post(async (req, res, next) => {
   const values = Object.values(req.files);
   const promises = values.map((image) =>
     cloudinary.uploader.upload(image.path)
@@ -125,13 +124,8 @@ UserRouter.route("/avatar/:userId").post(async (req, res, next) => {
   try {
     const imgData = await Promise.all(promises);
     const imgDataToStore = imgData[0].secure_url;
-    const data = await UserService.updateUserAvatar(
-      req.app.get("db"),
-      userId,
-      imgDataToStore
-    );
 
-    res.status(201).json(data);
+    res.status(201).json(imgDataToStore);
   } catch (error) {
     next(error);
   }
