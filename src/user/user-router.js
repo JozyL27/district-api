@@ -4,6 +4,9 @@ const path = require("path");
 const cloudinary = require("cloudinary");
 const UserService = require("./user-service");
 const ArticlesService = require("../articles/articles-service");
+const imagemin = require("imagemin");
+const imageminPngquant = require("imagemin-pngquant");
+const imageminMozjpeg = require("imagemin-mozjpeg");
 
 const UserRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -116,13 +119,28 @@ UserRouter.route("/:userId")
   });
 
 UserRouter.route("/avatar").post(async (req, res, next) => {
+  // add errors to this endpoint
   const values = Object.values(req.files);
-  const promises = values.map((image) =>
-    cloudinary.uploader.upload(image.path)
-  );
 
   try {
+    const files = await imagemin([values[0].path], {
+      destination: "build/images",
+      plugins: [
+        imageminMozjpeg({
+          quality: 70,
+        }),
+        imageminPngquant({
+          quality: [0.6, 0.8],
+          strip: true,
+        }),
+      ],
+    });
+
+    const promises = await files.map((image) =>
+      cloudinary.uploader.upload(image.destinationPath)
+    );
     const imgData = await Promise.all(promises);
+
     const imgDataToStore = imgData[0].secure_url;
 
     res.status(201).json(imgDataToStore);
