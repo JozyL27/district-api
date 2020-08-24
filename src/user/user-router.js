@@ -117,10 +117,21 @@ UserRouter.route("/:userId")
 
 UserRouter.route("/avatar").post(async (req, res, next) => {
   const values = Object.values(req.files);
+  const types = ["image/png", "image/jpeg"];
+  if (!types.includes(values[0].type)) {
+    return res.status(400).json({
+      error: `${values[0].type} is an unsupported file type.`,
+    });
+  }
+  if (values[0].size > 2000000) {
+    return res.status(400).json({
+      error: "image size cannot exceed 2mbs",
+    });
+  }
+
   const promises = values.map((image) =>
     cloudinary.uploader.upload(image.path)
   );
-
   try {
     const imgData = await Promise.all(promises);
     const imgDataToStore = imgData[0].secure_url;
