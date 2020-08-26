@@ -1,28 +1,22 @@
 const knex = require("knex");
 
 const { DB_URL } = require("../config");
-
-//TODO: Figure out a way to not have to create another knex instance here
 const db = knex({
   client: "pg",
   connection: DB_URL,
 });
 
 const MessageService = {
-  // Finds a conversation for two users or creates one if none exists
   findOrCreateConversation(user1id, user2id) {
     return db.transaction((trx) => {
-      // First try to find an existing conversation
       trx("conversations")
         .where("user1id", "in", [user1id, user2id])
         .andWhere("user2id", "in", [user1id, user2id])
         .first()
         .then((conversation) => {
-          // If the conversation was found return it
           if (conversation) {
             return conversation;
           } else {
-            // Otherwise create a new conversation and return it
             return trx("conversations")
               .insert({
                 user1id,
@@ -39,12 +33,9 @@ const MessageService = {
     });
   },
 
-  // Creates a message record in the database
   createMessage(message, sender_id, receiver_id) {
-    // First find their conversation
     return this.findOrCreateConversation(sender_id, receiver_id).then(
       (conversation) => {
-        // Then create the message
         return db("messages")
           .insert({
             conversation_id: conversation.id,
@@ -62,7 +53,13 @@ const MessageService = {
   getMessagesForConversation(conversation_id, page = 1) {
     const messagesPerPage = 12;
     const offset = messagesPerPage * (page - 1);
-    return db("messages").select("*").where({ conversation_id });
+
+    return db("messages")
+      .select("*")
+      .where({ conversation_id })
+      .orderBy("date_created", "asc")
+      .limit(messagesPerPage)
+      .offset(offset);
   },
 };
 
