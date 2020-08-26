@@ -26,6 +26,11 @@ const sessionConfig = {
   },
 };
 
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+};
+
 if (NODE_ENV === "production") {
   app.set("trust proxy", 1);
   sessionConfig.cookie.secure = true;
@@ -34,7 +39,7 @@ if (NODE_ENV === "production") {
 app.use(session(sessionConfig));
 app.use(morgan(morganOption));
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(formData.parse());
 
 app.use("/api/user", UserRouter);

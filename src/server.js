@@ -22,6 +22,6 @@ const db = knex({
 
 app.set("db", db);
 io.on("connection", SocketManager);
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
