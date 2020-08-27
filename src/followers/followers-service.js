@@ -19,7 +19,16 @@ const FollowersService = {
     const offset = usersPerPage * (page - 1);
 
     return db("user_followers")
-      .select("*")
+      .select(
+        "user_followers.user_id",
+        "user_followers.follower_id",
+        "user_followers.followed_user_on",
+        "district_users.id",
+        "district_users.username",
+        "district_users.avatar",
+        "district_users.bio",
+        "district_users.date_created as user_account_created_on"
+      )
       .where("user_followers.user_id", user_id)
       .innerJoin(
         "district_users",

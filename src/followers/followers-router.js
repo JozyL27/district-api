@@ -27,4 +27,17 @@ FollowersRouter.route("/").post(JsonBodyParser, async (req, res, next) => {
   }
 });
 
+FollowersRouter.route("/:userId").get(async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const followers = await FollowersService.getAllFollowers(
+      req.app.get("db"),
+      userId
+    );
+    res.status(200).json(followers);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = FollowersRouter;
