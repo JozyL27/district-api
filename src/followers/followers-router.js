@@ -27,13 +27,42 @@ FollowersRouter.route("/").post(JsonBodyParser, async (req, res, next) => {
   }
 });
 
-FollowersRouter.route("/:userId").get(async (req, res, next) => {
+FollowersRouter.route("/userfollowing/:userId").get(async (req, res, next) => {
   const { userId } = req.params;
+  const { page } = req.query;
   try {
-    const followers = await FollowersService.getAllFollowing(
+    const following = await FollowersService.getAllFollowing(
       req.app.get("db"),
-      userId
+      userId,
+      page
     );
+    if (following.length < 1) {
+      return res.status(400).json({
+        error: "You do not follow anyone.",
+      });
+    }
+    res.status(200).json(following);
+  } catch (error) {
+    next(error);
+  }
+});
+
+FollowersRouter.route("/userfollowers/:user_id").get(async (req, res, next) => {
+  const { user_id } = req.params;
+  const page = req.query;
+  try {
+    const followers = await FollowersService.getAllFollowers(
+      req.app.get("db"),
+      user_id,
+      page
+    );
+
+    if (followers.length < 1) {
+      return res.status(400).json({
+        error: "You have no followers.",
+      });
+    }
+
     res.status(200).json(followers);
   } catch (error) {
     next(error);
