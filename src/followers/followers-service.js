@@ -14,7 +14,10 @@ const FollowersService = {
       .andWhere("user_followers.follower_id", follower_id)
       .first();
   },
-  getAllFollowers(db, user_id, page = 1) {
+  // service below should be named get all following instead
+  // add service to get all users that follow me which will be named get all followers
+  // add block table in the future
+  getAllFollowing(db, user_id, page = 1) {
     const usersPerPage = 20;
     const offset = usersPerPage * (page - 1);
 
