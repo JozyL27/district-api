@@ -67,6 +67,16 @@ const FollowersService = {
       .limit(usersPerPage)
       .offset(offset);
   },
+  getFollowingCount(db, user_id) {
+    return db("user_followers")
+      .count({ following_count: "user_followers.follower_id" })
+      .where("user_followers.user_id", user_id);
+  },
+  getFollowersCount(db, user_id) {
+    return db("user_followers")
+      .count({ followers_count: "user_followers.follower_id" })
+      .where("user_followers.follower_id", user_id);
+  },
 };
 
 module.exports = FollowersService;

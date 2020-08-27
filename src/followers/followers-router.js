@@ -30,6 +30,7 @@ FollowersRouter.route("/").post(JsonBodyParser, async (req, res, next) => {
 FollowersRouter.route("/userfollowing/:userId").get(async (req, res, next) => {
   const { userId } = req.params;
   const { page } = req.query;
+
   try {
     const following = await FollowersService.getAllFollowing(
       req.app.get("db"),
@@ -50,6 +51,7 @@ FollowersRouter.route("/userfollowing/:userId").get(async (req, res, next) => {
 FollowersRouter.route("/userfollowers/:user_id").get(async (req, res, next) => {
   const { user_id } = req.params;
   const page = req.query;
+
   try {
     const followers = await FollowersService.getAllFollowers(
       req.app.get("db"),
@@ -64,6 +66,25 @@ FollowersRouter.route("/userfollowers/:user_id").get(async (req, res, next) => {
     }
 
     res.status(200).json(followers);
+  } catch (error) {
+    next(error);
+  }
+});
+
+FollowersRouter.route("/count/:user_id").get(async (req, res, next) => {
+  const { user_id } = req.params;
+
+  try {
+    const followingCount = await FollowersService.getFollowingCount(
+      req.app.get("db"),
+      user_id
+    );
+    const followersCount = await FollowersService.getFollowersCount(
+      req.app.get("db"),
+      user_id
+    );
+
+    res.status(200).json([...followingCount, ...followersCount]);
   } catch (error) {
     next(error);
   }
