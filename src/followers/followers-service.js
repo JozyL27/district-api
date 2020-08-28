@@ -60,7 +60,7 @@ const FollowersService = {
       .where("user_followers.follower_id", user_id)
       .innerJoin(
         "district_users",
-        "user_followers.follower_id",
+        "user_followers.user_id",
         "district_users.id"
       )
       .orderBy("followed_user_on", "desc")
