@@ -14,9 +14,6 @@ const FollowersService = {
       .andWhere("user_followers.follower_id", follower_id)
       .first();
   },
-  // service below should be named get all following instead
-  // add service to get all users that follow me which will be named get all followers
-  // add block table in the future
   getAllFollowing(db, user_id, page = 1) {
     const usersPerPage = 20;
     const offset = usersPerPage * (page - 1);
@@ -76,6 +73,11 @@ const FollowersService = {
     return db("user_followers")
       .count({ followers_count: "user_followers.follower_id" })
       .where("user_followers.follower_id", user_id);
+  },
+  unfollowUser(db, user_id, follower_id) {
+    return db("user_followers")
+      .where({ user_id: user_id, follower_id: follower_id })
+      .delete();
   },
 };
 
