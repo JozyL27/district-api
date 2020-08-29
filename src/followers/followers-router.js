@@ -90,4 +90,40 @@ FollowersRouter.route("/count/:user_id").get(async (req, res, next) => {
   }
 });
 
+FollowersRouter.route("/:user_id")
+  .get(async (req, res, next) => {
+    const { user_id } = req.params;
+    const { follower_id } = req.query;
+
+    try {
+      const alreadyAFollower = await FollowersService.alreadyFollowing(
+        req.app.get("db"),
+        user_id,
+        follower_id
+      );
+      if (alreadyAFollower) {
+        return res.status(200).json({ message: true });
+      } else {
+        return res.status(200).json({ message: false });
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+  .delete(JsonBodyParser, async (req, res, next) => {
+    const { user_id } = req.params;
+    const { follower_id } = req.body;
+    try {
+      await FollowersService.unfollowUser(
+        req.app.get("db"),
+        user_id,
+        follower_id
+      );
+
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
+
 module.exports = FollowersRouter;
