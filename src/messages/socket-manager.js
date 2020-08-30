@@ -6,6 +6,7 @@ const connectedSockets = {};
 
 module.exports = (socket) => {
   console.log("Socket.IO listening...");
+  console.log(connectedSockets);
 
   // Handles when a user Connects
   socket.on("newUser", (userId) => {
