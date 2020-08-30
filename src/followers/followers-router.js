@@ -3,29 +3,50 @@ const FollowersService = require("./followers-service");
 const JsonBodyParser = express.json();
 const FollowersRouter = express.Router();
 
-FollowersRouter.route("/").post(JsonBodyParser, async (req, res, next) => {
-  const { user_id, follower_id } = req.body;
-  const newFollower = { user_id, follower_id };
+FollowersRouter.route("/")
+  .post(JsonBodyParser, async (req, res, next) => {
+    const { user_id, follower_id } = req.body;
+    const newFollower = { user_id, follower_id };
 
-  try {
-    const alreadyAFollower = await FollowersService.alreadyFollowing(
-      req.app.get("db"),
-      user_id,
-      follower_id
-    );
-    if (alreadyAFollower) {
-      return res.status(400).json({ error: "You already follow this user." });
+    for (const [key, value] of Object.entries(newFollower))
+      if (value == null)
+        return res.status(400).json({
+          error: `Missing '${key}' in request body`,
+        });
+
+    try {
+      const alreadyAFollower = await FollowersService.alreadyFollowing(
+        req.app.get("db"),
+        user_id,
+        follower_id
+      );
+      if (alreadyAFollower) {
+        return res.status(400).json({ error: "You already follow this user." });
+      }
+      const newFollowerInfo = await FollowersService.addFollower(
+        req.app.get("db"),
+        newFollower
+      );
+
+      res.status(201).json(newFollowerInfo);
+    } catch (error) {
+      next(error);
     }
-    const newFollowerInfo = await FollowersService.addFollower(
-      req.app.get("db"),
-      newFollower
-    );
+  })
+  .delete(JsonBodyParser, async (req, res, next) => {
+    const { user_id, follower_id } = req.body;
+    try {
+      await FollowersService.unfollowUser(
+        req.app.get("db"),
+        user_id,
+        follower_id
+      );
 
-    res.status(201).json(newFollowerInfo);
-  } catch (error) {
-    next(error);
-  }
-});
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
 
 FollowersRouter.route("/userfollowing/:userId").get(async (req, res, next) => {
   const { userId } = req.params;
@@ -90,40 +111,24 @@ FollowersRouter.route("/count/:user_id").get(async (req, res, next) => {
   }
 });
 
-FollowersRouter.route("/:user_id")
-  .get(async (req, res, next) => {
-    const { user_id } = req.params;
-    const { follower_id } = req.query;
+FollowersRouter.route("/:user_id").get(async (req, res, next) => {
+  const { user_id } = req.params;
+  const { follower_id } = req.query;
 
-    try {
-      const alreadyAFollower = await FollowersService.alreadyFollowing(
-        req.app.get("db"),
-        user_id,
-        follower_id
-      );
-      if (alreadyAFollower) {
-        return res.status(200).json({ message: true });
-      } else {
-        return res.status(200).json({ message: false });
-      }
-    } catch (error) {
-      next(error);
+  try {
+    const alreadyAFollower = await FollowersService.alreadyFollowing(
+      req.app.get("db"),
+      user_id,
+      follower_id
+    );
+    if (alreadyAFollower) {
+      return res.status(200).json({ message: true });
+    } else {
+      return res.status(200).json({ message: false });
     }
-  })
-  .delete(JsonBodyParser, async (req, res, next) => {
-    const { user_id } = req.params;
-    const { follower_id } = req.body;
-    try {
-      await FollowersService.unfollowUser(
-        req.app.get("db"),
-        user_id,
-        follower_id
-      );
-
-      res.status(204).end();
-    } catch (error) {
-      next(error);
-    }
-  });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = FollowersRouter;

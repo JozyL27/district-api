@@ -1,6 +1,6 @@
 const knex = require("knex");
-
 const { DB_URL } = require("../config");
+
 const db = knex({
   client: "pg",
   connection: DB_URL,
@@ -50,16 +50,11 @@ const MessageService = {
     );
   },
 
-  getMessagesForConversation(conversation_id, page = 1) {
-    const messagesPerPage = 12;
-    const offset = messagesPerPage * (page - 1);
-
+  getMessagesForConversation(conversation_id) {
     return db("messages")
       .select("*")
       .where({ conversation_id })
-      .orderBy("date_created", "asc")
-      .limit(messagesPerPage)
-      .offset(offset);
+      .orderBy("date_created", "asc");
   },
 };
 
