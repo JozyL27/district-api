@@ -27,7 +27,10 @@ const sessionConfig = {
 };
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin:
+    NODE_ENV === "production"
+      ? "https://district-client.vercel.app"
+      : "http://localhost:3000",
   credentials: true,
 };
 
