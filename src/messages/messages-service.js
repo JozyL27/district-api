@@ -32,7 +32,6 @@ const MessageService = {
         .catch(trx.rollback);
     });
   },
-
   createMessage(message, sender_id, receiver_id) {
     return this.findOrCreateConversation(sender_id, receiver_id).then(
       (conversation) => {
@@ -49,12 +48,17 @@ const MessageService = {
       }
     );
   },
-
   getMessagesForConversation(conversation_id) {
     return db("messages")
       .select("*")
       .where({ conversation_id })
       .orderBy("date_created", "asc");
+  },
+  getConverstations(db, user_id) {
+    return db("conversations")
+      .select("*")
+      .where("conversations.user1id", user_id)
+      .orderBy("conversation_created", "desc");
   },
 };
 

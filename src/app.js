@@ -11,6 +11,7 @@ const ArticlesRouter = require("./articles/article-router");
 const UpvoteRouter = require("./Upvotes/upvote-router");
 const CommentsRouter = require("./comments/comments-router");
 const FollowersRouter = require("./followers/followers-router");
+const MessagesRouter = require("./messages/messages-router");
 const formData = require("express-form-data");
 const session = require("express-session");
 const app = express();
@@ -51,6 +52,7 @@ app.use("/api/articles", ArticlesRouter);
 app.use("/api/upvotes", UpvoteRouter);
 app.use("/api/comments", CommentsRouter);
 app.use("/api/followers", FollowersRouter);
+app.use("/api/messages", MessagesRouter);
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
