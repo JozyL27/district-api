@@ -54,11 +54,36 @@ const MessageService = {
       .where({ conversation_id })
       .orderBy("date_created", "asc");
   },
-  getConverstations(db, user_id) {
+  getConverstations(db, user_id, page = 1) {
+    const conversationsPerPage = 12;
+    const offset = conversationsPerPage * (page - 1);
+
     return db("conversations")
-      .select("*")
+      .select(
+        "conversations.id",
+        "conversations.user1id",
+        "conversations.user2id",
+        "conversations.conversation_created"
+      )
       .where("conversations.user1id", user_id)
-      .orderBy("conversation_created", "desc");
+      .orderBy("conversation_created", "desc")
+      .limit(conversationsPerPage)
+      .offset(offset);
+  },
+  getLastMessageInConversation(db, conversation_id) {
+    return db("conversations")
+      .select(
+        "messages.sender_id",
+        "messages.message",
+        "messages.date_created",
+        "district_users.avatar",
+        "district_users.username"
+      )
+      .innerJoin("messages", "conversations.id", "messages.conversation_id")
+      .innerJoin("district_users", "conversations.user2id", "district_users.id")
+      .where("conversations.id", conversation_id)
+      .orderBy("messages.date_created", "desc")
+      .first();
   },
 };
 
