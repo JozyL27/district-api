@@ -11,6 +11,13 @@ MessagesRouter.route("/conversations/:user_id").get(async (req, res, next) => {
       user_id,
       page
     );
+
+    if (conversations.length < 1) {
+      return res.status(400).json({
+        error: "You have no messages.",
+      });
+    }
+
     await Promise.all(
       conversations.map(
         async (convo) =>

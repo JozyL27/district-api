@@ -63,24 +63,21 @@ const MessageService = {
         "conversations.id",
         "conversations.user1id",
         "conversations.user2id",
-        "conversations.conversation_created"
+        "conversations.conversation_created",
+        "district_users.avatar",
+        "district_users.username",
+        "district_users.id as partner_id"
       )
       .where("conversations.user1id", user_id)
+      .innerJoin("district_users", "conversations.user2id", "district_users.id")
       .orderBy("conversation_created", "desc")
       .limit(conversationsPerPage)
       .offset(offset);
   },
   getLastMessageInConversation(db, conversation_id) {
     return db("conversations")
-      .select(
-        "messages.sender_id",
-        "messages.message",
-        "messages.date_created",
-        "district_users.avatar",
-        "district_users.username"
-      )
+      .select("messages.sender_id", "messages.message", "messages.date_created")
       .innerJoin("messages", "conversations.id", "messages.conversation_id")
-      .innerJoin("district_users", "conversations.user2id", "district_users.id")
       .where("conversations.id", conversation_id)
       .orderBy("messages.date_created", "desc")
       .first();
