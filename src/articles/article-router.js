@@ -1,287 +1,282 @@
-const express = require('express')
-const ArticlesService = require('./articles-service')
-const path = require('path')
+const express = require("express");
+const ArticlesService = require("./articles-service");
+const path = require("path");
 
-const jsonBodyParser = express.json()
-const ArticlesRouter = express.Router()
+const jsonBodyParser = express.json();
+const ArticlesRouter = express.Router();
 // post an article, get all articles from people you follow, article comment button added to frontend
 
-ArticlesRouter
-    .route('/categories')
-    .get(async (req, res, next) => {
-        try {
-            const categories = await ArticlesService.getCategories(
-                req.app.get('db')
-            )
-            if(categories.length == 0) {
-                res.status(400).json({ error: 'uh oh! There are no categories left.' })
-            }
-            if(!categories) {
-                res.status(400).json({ error: 'No categories were found.'})
-            }
-            res.status(200).json(categories.rows)
-        } catch(error) {
-            next(error)
-        }
-    })
+ArticlesRouter.route("/categories").get(async (req, res, next) => {
+  try {
+    const categories = await ArticlesService.getCategories(req.app.get("db"));
+    if (categories.length == 0) {
+      res.status(400).json({ error: "uh oh! There are no categories left." });
+    }
+    if (!categories) {
+      res.status(400).json({ error: "No categories were found." });
+    }
+    res.status(200).json(categories.rows);
+  } catch (error) {
+    next(error);
+  }
+});
 
-ArticlesRouter
-    .route('/popular')
-    .get(async (req, res, next) => {
-        const { page } = req.query
-        try {
-            const articles = await ArticlesService.getPopularArticles(
-                req.app.get('db'),
-                page
-            )
-            if(articles.length == 0) {
-                res.status(400).json({ error: 'uh oh! There are no articles left.' })
-            }
-            if(!articles) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
+ArticlesRouter.route("/popular").get(async (req, res, next) => {
+  const { page } = req.query;
+  try {
+    const articles = await ArticlesService.getPopularArticles(
+      req.app.get("db"),
+      page
+    );
+    if (articles.length == 0) {
+      res.status(400).json({ error: "uh oh! There are no articles left." });
+    }
+    if (!articles) {
+      res.status(400).json({ error: "No articles were found." });
+    }
+    res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
 
-ArticlesRouter
-    .route('/latest')
-    .get(async (req, res, next) => {
-        const { page } = req.query
-        try {
-            const articles = await ArticlesService.getMostRecentArticles(
-                req.app.get('db'),
-                page
-            )
-            if(!articles || articles.length < 1) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
+ArticlesRouter.route("/latest").get(async (req, res, next) => {
+  const { page } = req.query;
+  try {
+    const articles = await ArticlesService.getMostRecentArticles(
+      req.app.get("db"),
+      page
+    );
+    if (!articles || articles.length < 1) {
+      res.status(400).json({ error: "No articles were found." });
+    }
+    res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
 
-ArticlesRouter
-    .route('/upvoted/:userId')
-    .get(async (req, res, next) => {
-        const { userId } = req.params
-        const { page } = req.query
+ArticlesRouter.route("/upvoted/:userId").get(async (req, res, next) => {
+  const { userId } = req.params;
+  const { page } = req.query;
 
-        try {
-            const articles = await ArticlesService.getUpvotedArticles(
-                req.app.get('db'),
-                userId,
-                page
-            )
-            if(!articles || articles.length === 0) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
+  try {
+    const articles = await ArticlesService.getUpvotedArticles(
+      req.app.get("db"),
+      userId,
+      page
+    );
+    if (!articles || articles.length === 0) {
+      res.status(400).json({ error: "No articles were found." });
+    }
 
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
+    res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
 
-ArticlesRouter
-    .route('/')
-    .get(async (req, res, next) => {
-        const { page } = req.query
-        try {
-            const articles = await ArticlesService.getAllArticles(
-                req.app.get('db'),
-                page
-            )
-            if(articles.length == 0) {
-                res.status(400).json({ error: 'uh oh! There are no articles left.' })
-            }
-            if(!articles) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
-    .post(jsonBodyParser, async (req, res, next) => {
-        const { title, content, 
-            date_published, author, 
-            style, upvotes } = req.body
+ArticlesRouter.route("/")
+  .get(async (req, res, next) => {
+    const { page } = req.query;
+    try {
+      const articles = await ArticlesService.getAllArticles(
+        req.app.get("db"),
+        page
+      );
+      if (articles.length == 0) {
+        res.status(400).json({ error: "uh oh! There are no articles left." });
+      }
+      if (!articles) {
+        res.status(400).json({ error: "No articles were found." });
+      }
+      res.status(200).json(articles);
+    } catch (error) {
+      next(error);
+    }
+  })
+  .post(jsonBodyParser, async (req, res, next) => {
+    const { title, content, date_published, author, style, upvotes } = req.body;
 
-        const newArticle = { title, content, 
-            author, style }
+    const newArticle = { title, content, author, style };
 
-        try {
-            for(const [key, value] of Object.entries(newArticle))
-                if(value == null)
-                    return res.status(400).json({
-                        error: `Missing '${key}' in request body.`
-                    })
-            
-            if(title.length < 4) {
-                return res.status(400).json({
-                    error: 'Article title must be at least 4 characters long.'
-                })
-            }
+    try {
+      for (const [key, value] of Object.entries(newArticle))
+        if (value == null)
+          return res.status(400).json({
+            error: `Missing '${key}' in request body.`,
+          });
 
-            if(style.length < 1) {
-                return res.status(400).json({
-                    error: 'Article must have a category.'
-                })
-            }
+      if (title.length < 4) {
+        return res.status(400).json({
+          error: "Article title must be at least 4 characters long.",
+        });
+      }
 
-            if(content.length > 500) {
-                return res.status(400).json({
-                    error: 'Content must not exceed 500 characters.'
-                })
-            }
+      if (style.length < 1) {
+        return res.status(400).json({
+          error: "Article must have a category.",
+        });
+      }
 
-            // content should not exceed a certainnumber of characters.
-            newArticle.date_published = date_published
-            newArticle.upvotes = upvotes
+      if (content.length > 500) {
+        return res.status(400).json({
+          error: "Content must not exceed 500 characters.",
+        });
+      }
 
-            const article = await ArticlesService.insertArticle(
-                req.app.get('db'),
-                newArticle
-            )
+      // content should not exceed a certainnumber of characters.
+      newArticle.date_published = date_published;
+      newArticle.upvotes = upvotes;
 
-            res
-                .status(201)
-                .location(path.posix.join(req.originalUrl, `/${article.id}`))
-                .json(ArticlesService.serializeArticle(article))
-        } catch(error) {
-            next(error)
-        }
-    })
+      const article = await ArticlesService.insertArticle(
+        req.app.get("db"),
+        newArticle
+      );
 
-ArticlesRouter
-    .route('/:articleId')
-    .get(async (req, res, next) => {
-        const { articleId } = req.params
-        try {
-            const article  = await ArticlesService.getArticleById(
-                req.app.get('db'),
-                articleId
-            )
-            if(!article) {
-                return res.status(404).json({
-                    error: 'Article does not exist.'
-                })
-            }
-            const userInfo = await ArticlesService.getAuthorInfo(
-                req.app.get('db'),
-                article.author
-            )
+      res
+        .status(201)
+        .location(path.posix.join(req.originalUrl, `/${article.id}`))
+        .json(ArticlesService.serializeArticle(article));
+    } catch (error) {
+      next(error);
+    }
+  });
 
-            res.status(200).json({ ...ArticlesService.serializeArticle(article), ...userInfo })
-        } catch(error) {
-            next(error)
-        }
-    })
-    .delete(async (req, res, next) => {
-        const { articleId } = req.params
+ArticlesRouter.route("/:articleId")
+  .get(async (req, res, next) => {
+    const { articleId } = req.params;
+    try {
+      const article = await ArticlesService.getArticleById(
+        req.app.get("db"),
+        articleId
+      );
+      if (!article) {
+        return res.status(404).json({
+          error: "Article does not exist.",
+        });
+      }
+      const userInfo = await ArticlesService.getAuthorInfo(
+        req.app.get("db"),
+        article.author
+      );
 
-        try {
-            await ArticlesService.deleteArticle(
-                req.app.get('db'),
-                articleId
-            )
+      res
+        .status(200)
+        .json({ ...ArticlesService.serializeArticle(article), ...userInfo });
+    } catch (error) {
+      next(error);
+    }
+  })
+  .delete(async (req, res, next) => {
+    const { articleId } = req.params;
 
-            res.status(204).end()
-        } catch(error) {
-            next(error)
-        }
-    })
-    .patch(jsonBodyParser, async (req, res, next) => {
-        const { articleId } = req.params
-        const { title, content } = req.body
-        const articleToUpdate = { title, content }
+    try {
+      await ArticlesService.deleteArticle(req.app.get("db"), articleId);
 
-        const numberOfValues = Object.values(articleToUpdate).filter(Boolean).length
-        if (numberOfValues === 0)
-            return res.status(400).json({ error: `Request body must contain either 'title' or 'content'` })
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  })
+  .patch(jsonBodyParser, async (req, res, next) => {
+    const { articleId } = req.params;
+    const { title, content } = req.body;
+    const articleToUpdate = { title, content };
 
-        try {
-             await ArticlesService.updateArticle(
-                req.app.get('db'),
-                articleId,
-                articleToUpdate
-            )
+    const numberOfValues = Object.values(articleToUpdate).filter(Boolean)
+      .length;
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: `Request body must contain either 'title' or 'content'`,
+      });
 
-            res.status(204).end()
-        } catch(error) {
-            next(error)
-        }
-    })
+    try {
+      await ArticlesService.updateArticle(
+        req.app.get("db"),
+        articleId,
+        articleToUpdate
+      );
 
-ArticlesRouter
-    .route('/category/:categoryId')
-    .get(async (req, res, next) => {
-        let { categoryId } = req.params
-        const { page } = req.query
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
 
-        try {
-            const articles = await ArticlesService.getArticlesByCategory(
-                req.app.get('db'),
-                categoryId,
-                page
-            )
-            if(!articles) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
-            if(articles.length === 0) {
-                res.status(400).json({ error: `There are no ${categoryId} articles.` })
-            }
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
+ArticlesRouter.route("/category/:categoryId").get(async (req, res, next) => {
+  let { categoryId } = req.params;
+  const { page } = req.query;
 
-ArticlesRouter
-    .route('/userarticles/:userId')
-    .get(async (req, res, next) => {
-        const { page } = req.query
-        const { userId } = req.params
+  try {
+    const articles = await ArticlesService.getArticlesByCategory(
+      req.app.get("db"),
+      categoryId,
+      page
+    );
+    if (!articles) {
+      res.status(400).json({ error: "No articles were found." });
+    }
+    if (articles.length === 0) {
+      res.status(400).json({ error: `There are no ${categoryId} articles.` });
+    }
+    res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
 
-        try {
-            const articles = await ArticlesService.getAllUserArticles(
-                req.app.get('db'),
-                userId,
-                page
-            )
-            if(articles.length == 0) {
-                res.status(400).json({ error: 'You have no articles.' })
-            }
-            if(!articles) {
-                res.status(400).json({ error: 'No articles were found.'})
-            }
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
+ArticlesRouter.route("/userarticles/:userId").get(async (req, res, next) => {
+  const { page } = req.query;
+  const { userId } = req.params;
 
-ArticlesRouter
-    .route('/feed/:userId')
-    .get(async (req, res, next) => {
-        const { page } = req.query
-        const { userId } = req.params
+  try {
+    const articles = await ArticlesService.getAllUserArticles(
+      req.app.get("db"),
+      userId,
+      page
+    );
+    if (articles.length == 0) {
+      res.status(400).json({ error: "You have no articles." });
+    }
+    if (!articles) {
+      res.status(400).json({ error: "No articles were found." });
+    }
+    res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
 
-        try {
-            const articles = await ArticlesService.getAllFollowerArticles(
-                req.app.get('db'),
-                userId,
-                page
-            )
-            res.status(200).json(articles)
-        } catch(error) {
-            next(error)
-        }
-    })
+ArticlesRouter.route("/feed/:userId").get(async (req, res, next) => {
+  const { page } = req.query;
+  const { userId } = req.params;
 
+  try {
+    const articles = await ArticlesService.getAllFollowerArticles(
+      req.app.get("db"),
+      userId,
+      page
+    );
+    if (articles.length < 1) {
+      return res.status(400).json({
+        error: "You have no articles in your feed.",
+      });
+    }
 
-module.exports = ArticlesRouter
+    await Promise.all(
+      articles.map(
+        async (article) =>
+          (article.userInfo = await ArticlesService.getAuthorInfo(
+            req.app.get("db"),
+            article.author
+          ))
+      )
+    );
+    res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = ArticlesRouter;
