@@ -13,6 +13,7 @@ MessagesRouter.route("/conversations/:user_id").get(async (req, res, next) => {
     );
 
     if (conversations.length < 1) {
+      console.log(conversations);
       return res.status(400).json({
         error: "You have no messages.",
       });

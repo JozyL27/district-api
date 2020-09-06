@@ -69,6 +69,7 @@ const MessageService = {
         "district_users.id as partner_id"
       )
       .where("conversations.user1id", user_id)
+      .orWhere("conversations.user2id", user_id)
       .innerJoin("district_users", "conversations.user2id", "district_users.id")
       .orderBy("conversation_created", "desc")
       .limit(conversationsPerPage)
