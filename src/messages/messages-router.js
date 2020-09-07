@@ -1,6 +1,7 @@
 const express = require("express");
 const MessageService = require("./messages-service");
 const MessagesRouter = express.Router();
+const ArticlesService = require("../articles/articles-service");
 
 MessagesRouter.route("/conversations/:user_id").get(async (req, res, next) => {
   const { user_id } = req.params;
@@ -19,12 +20,26 @@ MessagesRouter.route("/conversations/:user_id").get(async (req, res, next) => {
       });
     }
 
+    // adding last message to conversation object
     await Promise.all(
       conversations.map(
         async (convo) =>
           (convo.lastMessage = await MessageService.getLastMessageInConversation(
             req.app.get("db"),
             convo.id
+          ))
+      )
+    );
+
+    // adding partner info to each conversation object.
+    await Promise.all(
+      conversations.map(
+        async (convo) =>
+          (convo.partnerInfo = await ArticlesService.getAuthorInfo(
+            req.app.get("db"),
+            Number(convo.user1id) === Number(user_id)
+              ? convo.user2id
+              : convo.user1id
           ))
       )
     );

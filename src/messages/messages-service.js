@@ -58,22 +58,24 @@ const MessageService = {
     const conversationsPerPage = 12;
     const offset = conversationsPerPage * (page - 1);
 
-    return db("conversations")
-      .select(
-        "conversations.id",
-        "conversations.user1id",
-        "conversations.user2id",
-        "conversations.conversation_created",
-        "district_users.avatar",
-        "district_users.username",
-        "district_users.id as partner_id"
-      )
-      .where("conversations.user1id", user_id)
-      .orWhere("conversations.user2id", user_id)
-      .innerJoin("district_users", "conversations.user2id", "district_users.id")
-      .orderBy("conversation_created", "desc")
-      .limit(conversationsPerPage)
-      .offset(offset);
+    return (
+      db("conversations")
+        .select(
+          "conversations.id",
+          "conversations.user1id",
+          "conversations.user2id",
+          "conversations.conversation_created"
+          // "district_users.avatar",
+          // "district_users.username",
+          // "district_users.id as partner_id"
+        )
+        .where("conversations.user1id", user_id)
+        .orWhere("conversations.user2id", user_id)
+        // .innerJoin("district_users", "conversations.user2id", "district_users.id")
+        .orderBy("conversation_created", "desc")
+        .limit(conversationsPerPage)
+        .offset(offset)
+    );
   },
   getLastMessageInConversation(db, conversation_id) {
     return db("conversations")
