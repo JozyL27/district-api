@@ -253,15 +253,36 @@ ArticlesRouter.route("/feed/:userId").get(async (req, res, next) => {
   const { userId } = req.params;
 
   try {
-    const articles = await ArticlesService.getAllFollowerArticles(
+    let articles = await ArticlesService.getAllFollowerArticles(
       req.app.get("db"),
       userId,
       page
     );
+
     if (articles.length < 1) {
-      return res.status(400).json({
-        error: "You have no articles in your feed.",
-      });
+      articles = await ArticlesService.getAllUserArticles(
+        req.app.get("db"),
+        userId,
+        page
+      );
+
+      if (articles.length < 1) {
+        return res.status(400).json({
+          error: "You have no articles in your feed.",
+        });
+      }
+
+      await Promise.all(
+        articles.map(
+          async (article) =>
+            (article.userInfo = await ArticlesService.getAuthorInfo(
+              req.app.get("db"),
+              article.author
+            ))
+        )
+      );
+
+      return res.status(200).json(articles);
     }
 
     await Promise.all(
@@ -273,6 +294,7 @@ ArticlesRouter.route("/feed/:userId").get(async (req, res, next) => {
           ))
       )
     );
+
     res.status(200).json(articles);
   } catch (error) {
     next(error);

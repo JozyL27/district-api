@@ -87,6 +87,7 @@ const ArticlesService = {
       .limit(articlesPerPage)
       .offset(offset);
   },
+  // not getting articles because you are not in user followers table
   getAllFollowerArticles(db, userId, page = 1) {
     const articlesPerPage = 9;
     const offset = articlesPerPage * (page - 1);
