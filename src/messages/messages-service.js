@@ -6,7 +6,6 @@ const db = knex({
   connection: DATABASE_URL,
 });
 
-// messages is bugged
 const MessageService = {
   findOrCreateConversation(user1id, user2id) {
     return db.transaction((trx) => {

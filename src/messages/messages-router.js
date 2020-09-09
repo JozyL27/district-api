@@ -6,6 +6,7 @@ const ArticlesService = require("../articles/articles-service");
 MessagesRouter.route("/conversations/:user_id").get(async (req, res, next) => {
   const { user_id } = req.params;
   const { page } = req.query;
+
   try {
     const conversations = await MessageService.getConverstations(
       req.app.get("db"),
