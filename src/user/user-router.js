@@ -78,13 +78,13 @@ UserRouter.route("/:userId")
     const { userId } = req.params;
     const { bio, username, avatar } = req.body;
 
-    if (bio.length > 250) {
-      return res.status(400).json({
-        error: "Bio cannot exceed 250 characters.",
-      });
-    }
-
     try {
+      if (bio.length > 250) {
+        return res.status(400).json({
+          error: "Bio cannot exceed 250 characters.",
+        });
+      }
+
       const usernameError = UserService.vaidateUsername(username);
 
       if (usernameError) return res.status(400).json({ error: usernameError });
