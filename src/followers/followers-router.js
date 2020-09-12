@@ -8,13 +8,13 @@ FollowersRouter.route("/")
     const { user_id, follower_id } = req.body;
     const newFollower = { user_id, follower_id };
 
-    for (const [key, value] of Object.entries(newFollower))
-      if (value == null)
-        return res.status(400).json({
-          error: `Missing '${key}' in request body`,
-        });
-
     try {
+      for (const [key, value] of Object.entries(newFollower))
+        if (value == null)
+          return res.status(400).json({
+            error: `Missing '${key}' in request body`,
+          });
+
       const alreadyAFollower = await FollowersService.alreadyFollowing(
         req.app.get("db"),
         user_id,

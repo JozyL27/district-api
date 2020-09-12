@@ -125,7 +125,7 @@ ArticlesRouter.route("/")
         });
       }
 
-      // content should not exceed a certainnumber of characters.
+      // content should not exceed a certain number of characters.
       newArticle.date_published = date_published;
       newArticle.upvotes = upvotes;
 
@@ -184,14 +184,13 @@ ArticlesRouter.route("/:articleId")
     const { title, content } = req.body;
     const articleToUpdate = { title, content };
 
-    const numberOfValues = Object.values(articleToUpdate).filter(Boolean)
-      .length;
-    if (numberOfValues === 0)
-      return res.status(400).json({
-        error: `Request body must contain either 'title' or 'content'`,
-      });
-
     try {
+      const numberOfValues = Object.values(articleToUpdate).filter(Boolean)
+        .length;
+      if (numberOfValues === 0)
+        return res.status(400).json({
+          error: `Request body must contain either 'title' or 'content'`,
+        });
       await ArticlesService.updateArticle(
         req.app.get("db"),
         articleId,
