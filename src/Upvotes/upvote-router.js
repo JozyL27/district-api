@@ -62,7 +62,7 @@ UpvoteRouter.route("/").post(JsonBodyParser, async (req, res, next) => {
   }
 });
 
-UpvoteRouter.route("/likes/:articleId").get(async (req, res, next) => {
+UpvoteRouter.route("/users/:articleId").get(async (req, res, next) => {
   const { articleId } = req.params;
   const { page } = req.query;
   try {
