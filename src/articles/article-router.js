@@ -1,10 +1,15 @@
 const express = require("express");
 const ArticlesService = require("./articles-service");
 const path = require("path");
+const cloudinary = require("cloudinary");
 
 const jsonBodyParser = express.json();
 const ArticlesRouter = express.Router();
-// post an article, get all articles from people you follow, article comment button added to frontend
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 ArticlesRouter.route("/categories").get(async (req, res, next) => {
   try {
@@ -295,6 +300,33 @@ ArticlesRouter.route("/feed/:userId").get(async (req, res, next) => {
     );
 
     res.status(200).json(articles);
+  } catch (error) {
+    next(error);
+  }
+});
+
+ArticlesRouter.route("/images").post(async (req, res, next) => {
+  const values = Object.values(req.files);
+  const types = ["image/png", "image/jpeg"];
+  if (!types.includes(values[0].type)) {
+    return res.status(400).json({
+      error: `${values[0].type} is an unsupported file type.`,
+    });
+  }
+  if (values[0].size > 2000000) {
+    return res.status(400).json({
+      error: "image size cannot exceed 2mbs",
+    });
+  }
+
+  const promises = values.map((image) =>
+    cloudinary.uploader.upload(image.path)
+  );
+  try {
+    const imgData = await Promise.all(promises);
+    const imgDataToStore = imgData[0].secure_url;
+
+    res.status(201).json(imgDataToStore);
   } catch (error) {
     next(error);
   }
