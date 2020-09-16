@@ -101,8 +101,19 @@ ArticlesRouter.route("/")
     }
   })
   .post(jsonBodyParser, async (req, res, next) => {
-    const { title, content, date_published, author, style, upvotes } = req.body;
+    const {
+      title,
+      content,
+      date_published,
+      author,
+      style,
+      upvotes,
+      image_one,
+    } = req.body;
 
+    // remove style from required?
+    // migrate changes to prod
+    // push changes to prod
     const newArticle = { title, content, author, style };
 
     try {
@@ -130,7 +141,8 @@ ArticlesRouter.route("/")
         });
       }
 
-      // content should not exceed a certain number of characters.
+      // add additional content
+      image_one.length > 1 ? (newArticle.image_one = image_one) : null;
       newArticle.date_published = date_published;
       newArticle.upvotes = upvotes;
 

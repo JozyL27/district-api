@@ -169,6 +169,7 @@ const ArticlesService = {
       style: article.style,
       author: article.author,
       upvotes: article.upvotes,
+      image_one: article.image_one,
     };
   },
   getArticleById(db, id) {
