@@ -2,7 +2,6 @@ const express = require("express");
 const ArticlesService = require("./articles-service");
 const path = require("path");
 const cloudinary = require("cloudinary");
-const { type } = require("os");
 
 const jsonBodyParser = express.json();
 const ArticlesRouter = express.Router();
