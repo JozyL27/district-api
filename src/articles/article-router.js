@@ -33,7 +33,7 @@ ArticlesRouter.route("/popular").get(async (req, res, next) => {
       req.app.get("db"),
       page
     );
-    if (articles.length == 0) {
+    if (articles.length === 0) {
       res.status(400).json({ error: "uh oh! There are no articles left." });
     }
     if (!articles) {
@@ -142,7 +142,6 @@ ArticlesRouter.route("/")
       }
 
       // add additional content
-      // image_one.length > 1 ? (newArticle.image_one = image_one) : null;
       newArticle.image_one = image_one;
       newArticle.date_published = date_published;
       newArticle.upvotes = upvotes;
