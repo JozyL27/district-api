@@ -2,6 +2,7 @@ const express = require("express");
 const ArticlesService = require("./articles-service");
 const path = require("path");
 const cloudinary = require("cloudinary");
+const { type } = require("os");
 
 const jsonBodyParser = express.json();
 const ArticlesRouter = express.Router();
@@ -142,7 +143,8 @@ ArticlesRouter.route("/")
       }
 
       // add additional content
-      image_one.length > 1 ? (newArticle.image_one = image_one) : null;
+      // image_one.length > 1 ? (newArticle.image_one = image_one) : null;
+      newArticle.image_one = image_one;
       newArticle.date_published = date_published;
       newArticle.upvotes = upvotes;
 
