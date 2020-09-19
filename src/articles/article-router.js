@@ -2,6 +2,7 @@ const express = require("express");
 const ArticlesService = require("./articles-service");
 const path = require("path");
 const cloudinary = require("cloudinary");
+const { requireAuth } = require("../middleware/jwt-auth");
 
 const jsonBodyParser = express.json();
 const ArticlesRouter = express.Router();
@@ -100,7 +101,7 @@ ArticlesRouter.route("/")
       next(error);
     }
   })
-  .post(jsonBodyParser, async (req, res, next) => {
+  .post(requireAuth, jsonBodyParser, async (req, res, next) => {
     const {
       title,
       content,
@@ -185,7 +186,7 @@ ArticlesRouter.route("/:articleId")
       next(error);
     }
   })
-  .delete(async (req, res, next) => {
+  .delete(requireAuth, async (req, res, next) => {
     const { articleId } = req.params;
 
     try {
@@ -195,30 +196,34 @@ ArticlesRouter.route("/:articleId")
     } catch (error) {
       next(error);
     }
-  })
-  .patch(jsonBodyParser, async (req, res, next) => {
-    const { articleId } = req.params;
-    const { title, content } = req.body;
-    const articleToUpdate = { title, content };
-
-    try {
-      const numberOfValues = Object.values(articleToUpdate).filter(Boolean)
-        .length;
-      if (numberOfValues === 0)
-        return res.status(400).json({
-          error: `Request body must contain either 'title' or 'content'`,
-        });
-      await ArticlesService.updateArticle(
-        req.app.get("db"),
-        articleId,
-        articleToUpdate
-      );
-
-      res.status(204).end();
-    } catch (error) {
-      next(error);
-    }
   });
+// update article endpoint disabled for time being -------
+
+// .patch(jsonBodyParser, async (req, res, next) => {
+//   const { articleId } = req.params;
+//   const { title, content } = req.body;
+//   const articleToUpdate = { title, content };
+
+//   try {
+//     const numberOfValues = Object.values(articleToUpdate).filter(Boolean)
+//       .length;
+//     if (numberOfValues === 0)
+//       return res.status(400).json({
+//         error: `Request body must contain either 'title' or 'content'`,
+//       });
+//     await ArticlesService.updateArticle(
+//       req.app.get("db"),
+//       articleId,
+//       articleToUpdate
+//     );
+
+//     res.status(204).end();
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// -------
 
 ArticlesRouter.route("/category/:categoryId").get(async (req, res, next) => {
   let { categoryId } = req.params;
@@ -264,28 +269,43 @@ ArticlesRouter.route("/userarticles/:userId").get(async (req, res, next) => {
   }
 });
 
-ArticlesRouter.route("/feed/:userId").get(async (req, res, next) => {
-  const { page } = req.query;
-  const { userId } = req.params;
+ArticlesRouter.route("/feed/:userId").get(
+  requireAuth,
+  async (req, res, next) => {
+    const { page } = req.query;
+    const { userId } = req.params;
 
-  try {
-    let articles = await ArticlesService.getAllFollowerArticles(
-      req.app.get("db"),
-      userId,
-      page
-    );
-
-    if (articles.length < 1) {
-      articles = await ArticlesService.getAllUserArticles(
+    try {
+      let articles = await ArticlesService.getAllFollowerArticles(
         req.app.get("db"),
         userId,
         page
       );
 
       if (articles.length < 1) {
-        return res.status(400).json({
-          error: "You have no articles in your feed.",
-        });
+        articles = await ArticlesService.getAllUserArticles(
+          req.app.get("db"),
+          userId,
+          page
+        );
+
+        if (articles.length < 1) {
+          return res.status(400).json({
+            error: "You have no articles in your feed.",
+          });
+        }
+
+        await Promise.all(
+          articles.map(
+            async (article) =>
+              (article.userInfo = await ArticlesService.getAuthorInfo(
+                req.app.get("db"),
+                article.author
+              ))
+          )
+        );
+
+        return res.status(200).json(articles);
       }
 
       await Promise.all(
@@ -298,26 +318,14 @@ ArticlesRouter.route("/feed/:userId").get(async (req, res, next) => {
         )
       );
 
-      return res.status(200).json(articles);
+      res.status(200).json(articles);
+    } catch (error) {
+      next(error);
     }
-
-    await Promise.all(
-      articles.map(
-        async (article) =>
-          (article.userInfo = await ArticlesService.getAuthorInfo(
-            req.app.get("db"),
-            article.author
-          ))
-      )
-    );
-
-    res.status(200).json(articles);
-  } catch (error) {
-    next(error);
   }
-});
+);
 
-ArticlesRouter.route("/images").post(async (req, res, next) => {
+ArticlesRouter.route("/images").post(requireAuth, async (req, res, next) => {
   const values = Object.values(req.files);
   const types = ["image/png", "image/jpeg"];
   if (!types.includes(values[0].type)) {

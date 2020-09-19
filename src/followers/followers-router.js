@@ -2,9 +2,10 @@ const express = require("express");
 const FollowersService = require("./followers-service");
 const JsonBodyParser = express.json();
 const FollowersRouter = express.Router();
+const { requireAuth } = require("../middleware/jwt-auth");
 
 FollowersRouter.route("/")
-  .post(JsonBodyParser, async (req, res, next) => {
+  .post(requireAuth, JsonBodyParser, async (req, res, next) => {
     const { user_id, follower_id } = req.body;
     const newFollower = { user_id, follower_id };
 
@@ -33,7 +34,7 @@ FollowersRouter.route("/")
       next(error);
     }
   })
-  .delete(JsonBodyParser, async (req, res, next) => {
+  .delete(requireAuth, JsonBodyParser, async (req, res, next) => {
     const { user_id, follower_id } = req.body;
     try {
       await FollowersService.unfollowUser(

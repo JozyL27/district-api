@@ -4,6 +4,7 @@ const path = require("path");
 const cloudinary = require("cloudinary");
 const UserService = require("./user-service");
 const ArticlesService = require("../articles/articles-service");
+const { requireAuth } = require("../middleware/jwt-auth");
 
 const UserRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -115,7 +116,7 @@ UserRouter.route("/:userId")
     }
   });
 
-UserRouter.route("/avatar").post(async (req, res, next) => {
+UserRouter.route("/avatar").post(requireAuth, async (req, res, next) => {
   const values = Object.values(req.files);
   const types = ["image/png", "image/jpeg"];
   if (!types.includes(values[0].type)) {

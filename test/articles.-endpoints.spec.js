@@ -1,6 +1,7 @@
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 const supertest = require("supertest");
+const { expect } = require("chai");
 
 describe("Articles endpoints", () => {
   let db;
@@ -32,7 +33,7 @@ describe("Articles endpoints", () => {
   });
 
   describe("/api/articles/popular", () => {
-    beforeEach("insert articles", () =>
+    before("insert articles", () =>
       helpers.seedUsersArticles(db, testUsers, testArticles)
     );
     it("responds with 200 and an array of articles", () => {
@@ -40,7 +41,6 @@ describe("Articles endpoints", () => {
         .get("/api/articles/popular")
         .expect(200)
         .expect((res) => {
-          console.log(res.body);
           expect(res.body[0]).to.have.keys(
             "title",
             "author",
@@ -53,6 +53,12 @@ describe("Articles endpoints", () => {
             "id"
           );
         });
+    });
+
+    it("responds with 400 if there are no articles", () => {
+      return supertest(app).get("/api/articles/popular").expect(400, {
+        error: "uh oh! There are no articles left.",
+      });
     });
   });
 });

@@ -1,45 +1,50 @@
 const express = require("express");
 const CommentService = require("./comments-service");
 const path = require("path");
+const { requireAuth } = require("../middleware/jwt-auth");
 
 const JsonBodyParser = express.json();
 const CommentsRouter = express.Router();
 
-CommentsRouter.route("/").post(JsonBodyParser, async (req, res, next) => {
-  const { text, date_commented, user_id, article_id } = req.body;
-  const newComment = { text, article_id, user_id };
+CommentsRouter.route("/").post(
+  requireAuth,
+  JsonBodyParser,
+  async (req, res, next) => {
+    const { text, date_commented, user_id, article_id } = req.body;
+    const newComment = { text, article_id, user_id };
 
-  try {
-    for (const [key, value] of Object.entries(newComment))
-      if (value == null)
-        return res.status(400).json({
-          error: `Missing '${key}' in request body.`,
-        });
+    try {
+      for (const [key, value] of Object.entries(newComment))
+        if (value == null)
+          return res.status(400).json({
+            error: `Missing '${key}' in request body.`,
+          });
 
-    if (text.length < 1) {
-      return res.status(400).json({ error: `Comment body cannot be empty.` });
+      if (text.length < 1) {
+        return res.status(400).json({ error: `Comment body cannot be empty.` });
+      }
+      if (text.length > 250) {
+        return res
+          .status(400)
+          .json({ error: "Comments cannot exceed 250 characters." });
+      }
+
+      newComment.date_commented = date_commented;
+
+      const comment = await CommentService.insertComment(
+        req.app.get("db"),
+        newComment
+      );
+
+      res
+        .status(201)
+        .location(path.posix.join(req.originalUrl, `/${comment.id}`))
+        .json(CommentService.serializeComment(comment));
+    } catch (error) {
+      next(error);
     }
-    if (text.length > 250) {
-      return res
-        .status(400)
-        .json({ error: "Comments cannot exceed 250 characters." });
-    }
-
-    newComment.date_commented = date_commented;
-
-    const comment = await CommentService.insertComment(
-      req.app.get("db"),
-      newComment
-    );
-
-    res
-      .status(201)
-      .location(path.posix.join(req.originalUrl, `/${comment.id}`))
-      .json(CommentService.serializeComment(comment));
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 CommentsRouter.route("/:commentId")
   .get(async (req, res, next) => {
@@ -59,7 +64,7 @@ CommentsRouter.route("/:commentId")
       next(error);
     }
   })
-  .delete(async (req, res, next) => {
+  .delete(requireAuth, async (req, res, next) => {
     const { commentId } = req.params;
 
     try {
@@ -70,7 +75,7 @@ CommentsRouter.route("/:commentId")
       next(error);
     }
   })
-  .patch(JsonBodyParser, async (req, res, next) => {
+  .patch(requireAuth, JsonBodyParser, async (req, res, next) => {
     const { commentId } = req.params;
     const { text } = req.body;
     const commentToUpdate = { text };
