@@ -15,6 +15,7 @@ const MessagesRouter = require("./messages/messages-router");
 const formData = require("express-form-data");
 const session = require("express-session");
 const app = express();
+const compression = require("compression");
 
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 
@@ -35,6 +36,17 @@ const corsOptions = {
   credentials: true,
 };
 
+const compressionOptions = {
+  level: 6,
+  threshold: 10 * 1000,
+  filter: (req, res) => {
+    if (req.headers["x-no-compression"]) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+};
+
 if (NODE_ENV === "production") {
   app.set("trust proxy", 1);
   sessionConfig.cookie.secure = true;
@@ -44,6 +56,7 @@ app.use(session(sessionConfig));
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors(corsOptions));
+app.use(compression(compressionOptions));
 app.use(formData.parse());
 
 app.use("/api/user", UserRouter);
