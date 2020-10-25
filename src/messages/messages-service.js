@@ -15,7 +15,6 @@ const MessageService = {
         .first()
         .then((conversation) => {
           if (conversation) {
-            console.log(conversation);
             return conversation;
           } else {
             return trx("conversations")

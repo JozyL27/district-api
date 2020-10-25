@@ -14,17 +14,29 @@ const FollowersRouter = require("./followers/followers-router");
 const MessagesRouter = require("./messages/messages-router");
 const formData = require("express-form-data");
 const session = require("express-session");
-const app = express();
 const compression = require("compression");
+
+const app = express();
+
+interface Session {
+  secret: string;
+  resave: boolean;
+  saveUninitialized: boolean;
+  cookie: {
+    sameSite: string;
+    secure: boolean;
+  };
+}
 
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 
-const sessionConfig = {
+const sessionConfig: Session = {
   secret: "graduation",
   resave: false,
   saveUninitialized: false,
   cookie: {
     sameSite: "None",
+    secure: false,
   },
 };
 
@@ -39,7 +51,7 @@ const corsOptions = {
 const compressionOptions = {
   level: 6,
   threshold: 10 * 1000,
-  filter: (req, res) => {
+  filter: (req: any, res: any) => {
     if (req.headers["x-no-compression"]) {
       return false;
     }
@@ -66,10 +78,10 @@ app.use("/api/upvotes", UpvoteRouter);
 app.use("/api/comments", CommentsRouter);
 app.use("/api/followers", FollowersRouter);
 app.use("/api/messages", MessagesRouter);
-app.get("/", (req, res) => {
+app.get("/", (req: any, res: any) => {
   res.send("Hello, World!");
 });
 
 app.use(errorHandler);
 
-module.exports = app;
+export default app;
